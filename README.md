@@ -19,7 +19,9 @@
 
 ## La Vulnerabilità
 
-- OWASP Top 10: A8:2017 - Insecure Deserialization
+- [OWASP Top 10: A8:2017 - Insecure Deserialization](https://github.com/OWASP/www-project-top-ten/blob/master/2017/A8_2017-Insecure_Deserialization.md)
+- OWASP Top 10: [A08:2021 – Software and Data Integrity Failures](https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/)
+
 - Rischi:
     - Esecuzione di codice remoto (RCE)
     - Attacchi denial-of-service
