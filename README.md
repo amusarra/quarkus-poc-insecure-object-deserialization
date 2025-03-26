@@ -278,6 +278,7 @@ value: 42
 
 - [OWASP Deserialization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html)
 - [OWASP A8:2017 - Insecure Deserialization](https://github.com/OWASP/Top10/blob/master/2017/en/0xa8-insecure-deserialization.md)
+- [A08:2021 – Software and Data Integrity Failures](https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/)
 - SANS Top 25 - Insecure Deserialization
 - https://github.com/OWASP/CheatSheetSeries
 
