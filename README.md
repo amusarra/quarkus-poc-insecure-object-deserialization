@@ -56,12 +56,22 @@ Per eseguire l'applicazione è sufficiente eseguire il comando `mvn quarkus:dev`
 ## Esempio: Exploiting Java Deserialization
 
 ```java
-// Classe malevola
 public class Exploit implements Serializable {
+  /**
+   * Serial version UID utilizzato per la compatibilità di serializzazione.
+   */
+  @Serial
+  private static final long serialVersionUID = -5022552899262915270L;
+
+  /**
+   * Blocco di inizializzazione statica che viene eseguito quando la classe viene caricata.
+   * Esegue un comando shell che scrive un messaggio nel file /tmp/hacked simulando
+   * un'esecuzione di codice remoto (RCE).
+   */
   static {
     try {
       ProcessBuilder processBuilder =
-          new ProcessBuilder("sh", "-c", "echo \"Sei stato hackerato ;-)\" >> /tmp/hacked");
+              new ProcessBuilder("sh", "-c", "echo \"Sei stato hackerato ;-)\" >> /tmp/hacked");
       processBuilder.start();
     } catch (Exception e) {
       e.printStackTrace();
@@ -75,15 +85,15 @@ public class Exploit implements Serializable {
 ## Vulnerabilità #1: Java Binary Serialization
 
 ```java
-@POST
+  @POST
 @Path("/deserialize")
 @Consumes(MediaType.APPLICATION_OCTET_STREAM)
 public Response deserialize(InputStream input) throws IOException, ClassNotFoundException {
-  ObjectInputStream objectInputStream = new ObjectInputStream(input);
-
-  // Vulnerabile! Qualsiasi oggetto può essere deserializzato
-  Object obj = objectInputStream.readObject();
-  return Response.ok("Deserialized: %s".formatted(obj.getClass().getName())).build();
+  try (ObjectInputStream objectInputStream = new ObjectInputStream(input)) {
+    // Pericolo! Qualsiasi oggetto può essere deserializzato
+    Object obj = objectInputStream.readObject();
+    return Response.ok("Deserialized: %s".formatted(obj.getClass().getName())).build();
+  }
 }
 ```
 
@@ -101,10 +111,14 @@ curl -X POST http://localhost:8080/api/v1/deserialize \
 ## Mitigazione #1: Filtri di Classe
 
 ```java
-@POST
+  @POST
 @Path("/deserialize-secure")
+@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 public Response deserializeSecure(InputStream input) throws IOException, ClassNotFoundException {
   ObjectInputStream objectInputStream = new ObjectInputStream(input);
+
+  // Blocca la deserializzazione di classi pericolose
+  // attraverso l'uso di ObjectInputFilter
   objectInputStream.setObjectInputFilter(info -> {
     if (info.serialClass() != null &&
         info.serialClass().getName().startsWith(SAFE_PACKAGE)) {
@@ -112,7 +126,9 @@ public Response deserializeSecure(InputStream input) throws IOException, ClassNo
     }
     return ObjectInputFilter.Status.REJECTED;
   });
+
   Object obj = objectInputStream.readObject();
+
   return Response.ok("Deserialized: %s".formatted(obj.getClass().getName())).build();
 }
 ```
@@ -284,16 +300,6 @@ value: 42'
 4. Preferire formati alternativi (JSON, XML) con parser sicuri
 5. Mantenere librerie aggiornate
 6. Monitorare CVE relativi alle librerie di serializzazione
-
----
-
-## Esempio di Dati Sicuri (YAML)
-
-```yaml
-# Esempio sicuro per SafeClass
-name: "Esempio sicuro"
-value: 42
-```
 
 ---
 
