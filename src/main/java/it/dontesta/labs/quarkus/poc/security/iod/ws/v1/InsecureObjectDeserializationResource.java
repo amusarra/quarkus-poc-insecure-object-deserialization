@@ -72,6 +72,9 @@ public class InsecureObjectDeserializationResource {
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   public Response deserializeSecure(InputStream input) throws IOException, ClassNotFoundException {
     ObjectInputStream objectInputStream = new ObjectInputStream(input);
+
+    // Blocca la deserializzazione di classi pericolose
+    // attraverso l'uso di ObjectInputFilter
     objectInputStream.setObjectInputFilter(info -> {
       if (info.serialClass() != null &&
           info.serialClass().getName().startsWith(SAFE_PACKAGE)) {
@@ -79,7 +82,9 @@ public class InsecureObjectDeserializationResource {
       }
       return ObjectInputFilter.Status.REJECTED;
     });
+
     Object obj = objectInputStream.readObject();
+
     return Response.ok("Deserialized: %s".formatted(obj.getClass().getName())).build();
   }
 
