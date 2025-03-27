@@ -4,6 +4,29 @@
 
 ## Un'analisi di vulnerabilità e mitigazioni
 
+Questo progetto è basato su Quarkus 3.19 e richiede pertanto che abbiate installato sulla vostra macchina Java 21 e Maven 3.9.
+
+Per testare le vulnerabilità e le relative mitigazioni, sono stati predisposti i seguenti componenti.
+
+1. Servizio REST `/api/v1/deserialize` per la deserializzazione di oggetti Java binari
+2. Servizio REST `/api/v1/deserialize-secure` per la mitigazione della deserializzazione sicura di oggetti Java binari
+3. Servizio REST `/api/v1/deserialize-json` per la deserializzazione di oggetti JSON
+4. Servizio REST `/api/v1/deserialize-json-secure` per la mitigazione della deserializzazione sicura di oggetti JSON
+5. Servizio REST `/api/v1/deserialize-yaml` per la deserializzazione di oggetti YAML
+6. Servizio REST `/api/v1/deserialize-yaml-secure` per la mitigazione della deserializzazione sicura di oggetti YAML
+7. La classe `Exploit` per dimostrare l'esecuzione di codice malevolo
+8. La classe `SafeClass` per dimostrare la deserializzazione sicura
+
+Per eseguire alcuni test, è necessario ottenere i file della serializzazione delle due classi Exploit e SafeClass. Per farlo, eseguire il seguente comando Maven:
+
+```shell
+mvn test
+```
+
+L'esecuzione dei test farà in modo di generare all'interno della directory `target` del progetto i due file `exploit-payload-to-testing.ser` e `safe-payload-to-testing.ser`.
+
+Per eseguire l'applicazione è sufficiente eseguire il comando `mvn quarkus:dev`
+
 ---
 
 ## Cosa è la Deserializzazione di Oggetti?
